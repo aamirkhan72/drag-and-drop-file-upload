@@ -1,82 +1,132 @@
-// Selecting required elements
-const dropArea = document.querySelector(".drag-area"),
-    dragText = dropArea.querySelector("header"),
-    button = dropArea.querySelector("button"),
-    input = dropArea.querySelector("input"),
-    progressContainer = dropArea.querySelector(".progress-container"),
-    progressBar = dropArea.querySelector(".progress-bar");
+document.addEventListener("DOMContentLoaded", () => {
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const fileInput = document.getElementById("fileInput");
+    const browseFileButton = document.getElementById("browseFile");
+    const progressContainer = document.querySelector(".progress-container");
+    const progressBar = document.querySelector(".progress-bar");
+    const previewContainer = document.getElementById("preview-container");
+    const dragArea = document.querySelector(".drag-area");
 
-let file; // This is a global variable to store the selected file
+    // Toggle Dark Mode
+    darkModeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        const isDarkMode = document.body.classList.contains("dark-mode");
+        darkModeToggle.textContent = isDarkMode ? "Light Mode" : "Dark Mode";
+    });
 
-// When the button is clicked, trigger the file input
-button.onclick = () => {
-    input.click();
-};
+    // File Upload (Drag & Drop)
+    dragArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dragArea.classList.add("dragging");
+    });
 
-// Handling file selection
-input.addEventListener("change", function () {
-    file = this.files[0];
-    dropArea.classList.add("active");
-    showFile();
-});
+    dragArea.addEventListener("dragleave", () => {
+        dragArea.classList.remove("dragging");
+    });
 
-// If user drags a file over the drop area
-dropArea.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    dropArea.classList.add("active");
-    dragText.textContent = "Release to Upload File";
-});
+    dragArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dragArea.classList.remove("dragging");
+        handleFiles(e.dataTransfer.files);
+    });
 
-// If user leaves the dragged file from the drop area
-dropArea.addEventListener("dragleave", () => {
-    dropArea.classList.remove("active");
-    dragText.textContent = "Drag & Drop to Upload File";
-});
+    browseFileButton.addEventListener("click", () => {
+        fileInput.click();
+    });
 
-// If user drops a file into the drop area
-dropArea.addEventListener("drop", (event) => {
-    event.preventDefault();
-    file = event.dataTransfer.files[0];
-    showFile();
-});
+    fileInput.addEventListener("change", (e) => {
+        handleFiles(e.target.files);
+    });
 
-// Function to handle file display
-function showFile() {
-    let fileType = file.type;
-    let validExtensions = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-
-    if (validExtensions.includes(fileType)) {
-        let reader = new FileReader();
-        reader.onload = () => {
-            let fileURL = reader.result;
-            if (fileType.startsWith("image/")) {
-                let imgTag = `<img src="${fileURL}" alt="Uploaded Image">`;
-                dropArea.innerHTML = imgTag;
-            } else if (fileType === "application/pdf") {
-                let pdfTag = `<iframe src="${fileURL}" width="100%" height="400px" frameborder="0"></iframe>`;
-                dropArea.innerHTML = pdfTag;
-            }
-        };
-
-        // Show progress bar during file loading
+    // Handle files (preview and progress)
+    function handleFiles(files) {
+        previewContainer.innerHTML = ""; // Clear previous previews
         progressContainer.style.display = "block";
-        let loadProgress = 0;
-        let interval = setInterval(() => {
-            if (loadProgress < 100) {
-                loadProgress += 10;
-                progressBar.style.width = loadProgress + "%";
-            } else {
-                clearInterval(interval);
-                progressBar.style.width = "100%";
-                reader.readAsDataURL(file);
-            }
-        }, 100);
-    } else {
-        showError("This file type is not supported.");
-    }
-}
+        progressBar.style.width = "0%";
 
-// Show error message
-function showError(message) {
-    dropArea.innerHTML = `<p style="color: red;">${message}</p>`;
-}
+        Array.from(files).forEach((file) => {
+            const preview = document.createElement("div");
+            preview.classList.add("preview");
+
+            if (file.type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.onload = () => URL.revokeObjectURL(img.src); // Clean up after preview
+                preview.appendChild(img);
+            } else if (file.type.startsWith("video/")) {
+                const video = document.createElement("video");
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                preview.appendChild(video);
+            } else if (file.type === "application/pdf") {
+                const object = document.createElement("object");
+                object.data = URL.createObjectURL(file);
+                object.type = "application/pdf";
+                object.width = "100%";
+                object.height = "200px";
+                preview.appendChild(object);
+            }
+            previewContainer.appendChild(preview);
+
+            // Simulate progress bar (for demonstration)
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 100) {
+                    progress += 10;
+                    progressBar.style.width = progress + "%";
+                } else {
+                    clearInterval(interval);
+                }
+            }, 200);
+        });
+    }
+
+    // Convert to PDF (only works for images)
+    document.getElementById("convertToPDF").addEventListener("click", () => {
+        const images = previewContainer.querySelectorAll("img");
+        if (images.length === 0) {
+            alert("Please upload an image to convert to PDF.");
+            return;
+        }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        images.forEach((image, index) => {
+            if (index > 0) pdf.addPage();
+            pdf.addImage(image.src, 'JPEG', 10, 10, 180, 160);
+        });
+        pdf.save("converted.pdf");
+    });
+
+    // Convert PDF to JPEG
+    document.getElementById("convertToJPG").addEventListener("click", () => {
+        const pdfFiles = previewContainer.querySelectorAll("object");
+        if (pdfFiles.length === 0) {
+            alert("Please upload a PDF to convert to JPG.");
+            return;
+        }
+        const file = pdfFiles[0].data;
+        const loadingTask = pdfjsLib.getDocument(file);
+        loadingTask.promise.then((pdf) => {
+            const numPages = pdf.numPages;
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+                pdf.getPage(pageNum).then((page) => {
+                    const viewport = page.getViewport({ scale: 1 });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise.then(() => {
+                        const img = new Image();
+                        img.src = canvas.toDataURL("image/jpeg");
+                        previewContainer.appendChild(img);
+                    });
+                });
+            }
+        }).catch((error) => {
+            alert("Error loading PDF: " + error);
+        });
+    });
+});

@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+/* Import modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -12,74 +13,76 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: #f1f5f9;
+    background: #f8f9fa;
+    transition: background 0.3s ease-in-out;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.theme-toggle {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+#darkModeToggle {
+    padding: 8px 16px;
+    border: none;
+    background: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#darkModeToggle:hover {
+    background: #0056b3;
 }
 
 .drag-area {
-    border: 2px dashed #00A5FF;
-    height: 500px;
-    width: 700px;
-    border-radius: 15px;
+    border: 2px dashed #007bff;
+    height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.drag-area:hover {
-    transform: scale(1.05);
-}
-
-.drag-area.active {
-    border: 2px solid #00A5FF;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+    position: relative;
 }
 
 .drag-area .icon {
-    font-size: 80px;
-    color: #00A5FF;
+    font-size: 70px;
+    color: #007bff;
 }
 
 .drag-area header {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 600;
     color: #333;
-    margin: 20px 0;
-}
-
-.drag-area span {
-    font-size: 20px;
-    font-weight: 500;
-    color: #888;
-    margin: 10px 0 15px 0;
 }
 
 .drag-area button {
-    padding: 12px 30px;
-    font-size: 20px;
-    font-weight: 500;
-    border: none;
-    outline: none;
-    background: linear-gradient(145deg, #00A5FF, #0077CC);
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: #007bff;
     color: #fff;
-    border-radius: 30px;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
 
 .drag-area button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.drag-area img {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    border-radius: 10px;
+    background: #0056b3;
 }
 
 .progress-container {
@@ -87,13 +90,97 @@ body {
     height: 5px;
     background: #ddd;
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 15px;
+    display: none;
 }
 
 .progress-bar {
     height: 100%;
-    background: #00A5FF;
+    background: #007bff;
     width: 0%;
     border-radius: 10px;
-    transition: width 0.3s ease;
+    transition: width 0.4s ease;
+}
+
+#preview-container {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.preview {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 2px solid #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview img, .preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.options button {
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.options button:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+.options button:active {
+    transform: scale(0.95);
+}
+
+.dark-mode {
+    background: #121212;
+    color: #fff;
+}
+
+.dark-mode .container {
+    background: #1e1e1e;
+}
+
+.dark-mode .drag-area {
+    background: #2c2c2c;
+    border-color: #00bfff;
+}
+
+.dark-mode .progress-container {
+    background: #444;
+}
+
+.dark-mode .progress-bar {
+    background: #00bfff;
+}
+
+.dark-mode .options button, .dark-mode #darkModeToggle {
+    background: #00bfff;
+}
+
+.dark-mode .options button:hover, .dark-mode #darkModeToggle:hover {
+    background: #0080ff;
 }

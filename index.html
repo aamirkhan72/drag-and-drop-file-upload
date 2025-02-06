@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drag & Drop or Browse: File Upload</title>
+    <title>File Upload & Conversion Tool</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <!-- Include jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include pdf.js for PDF to image conversion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
-
 <body>
-    <div class="drag-area">
-        <div class="icon">
-            <i class="fas fa-cloud-upload-alt"></i>
+    <div class="container">
+        <div class="theme-toggle">
+            <button id="darkModeToggle">Dark Mode</button>
         </div>
-        <header>Drag & Drop to Upload File</header>
-        <span>OR</span>
-        <button>Browse File</button>
-        <input type="file" hidden multiple>
-        <div class="progress-container" style="display:none;">
-            <div class="progress-bar"></div>
+        <div class="drag-area">
+            <div class="icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <header>Drag & Drop to Upload File</header>
+            <span>OR</span>
+            <button id="browseFile">Browse File</button>
+            <input type="file" id="fileInput" hidden multiple>
+            <div class="progress-container" style="display:none;">
+                <div class="progress-bar"></div>
+            </div>
+            <div id="preview-container"></div>
+        </div>
+        <div class="options">
+            <button id="convertToPDF">Convert to PDF</button>
+            <button id="convertToImage">Convert to Image</button>
+            <button id="convertToJPG">Convert PDF to JPG</button>
+            <button id="convertToVideo">Video Preview</button>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
-
 </html>
